@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://i6hq04ibrr3p"]
+[gd_scene load_steps=35 format=3 uid="uid://i6hq04ibrr3p"]
 
 [ext_resource type="Texture2D" uid="uid://6fcom3h540ti" path="res://background/background.png" id="1_qi08d"]
 [ext_resource type="Script" uid="uid://7h2sq25tmfdr" path="res://background/background.gd" id="2_4cf3x"]
@@ -9,6 +9,11 @@
 [ext_resource type="AudioStream" uid="uid://bjclsiplnethj" path="res://train/train_mouvementV2.mp3" id="6_of623"]
 [ext_resource type="AudioStream" uid="uid://d1q4jfqnfd4cd" path="res://train/pièce.mp3" id="7_tqddv"]
 [ext_resource type="Texture2D" uid="uid://b6xwj6q7owyyj" path="res://train/pièceV2.png" id="8_tqddv"]
+[ext_resource type="Texture2D" uid="uid://c2mugft4ffx4j" path="res://train/socle_vie.png" id="10_aryr7"]
+[ext_resource type="Texture2D" uid="uid://d04r5dbw372gg" path="res://train/barre Rouge.png" id="11_3sfp5"]
+[ext_resource type="Texture2D" uid="uid://clceg7wr4uf7g" path="res://enemy/moustique all.png" id="12_3sfp5"]
+[ext_resource type="Texture2D" uid="uid://dw8ellc2t0ylt" path="res://train/barre Verte.png" id="12_bbwta"]
+[ext_resource type="Script" uid="uid://clgk7ymavvj11" path="res://background/area_moustique.gd" id="13_nswt3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_khhwp"]
 size = Vector2(437.864, 378.093)
@@ -95,6 +100,52 @@ animations = [{
 "speed": 10.0
 }]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_62400"]
+atlas = ExtResource("12_3sfp5")
+region = Rect2(0, 0, 1536, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gkp7x"]
+atlas = ExtResource("12_3sfp5")
+region = Rect2(6144, 0, 1536, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h8dd5"]
+atlas = ExtResource("12_3sfp5")
+region = Rect2(4608, 0, 1536, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bb02h"]
+atlas = ExtResource("12_3sfp5")
+region = Rect2(1536, 0, 1536, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_smcq2"]
+atlas = ExtResource("12_3sfp5")
+region = Rect2(3072, 0, 1536, 1024)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_0chbm"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_62400")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gkp7x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h8dd5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bb02h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_smcq2")
+}],
+"loop": true,
+"name": &"default",
+"speed": 24.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_62400"]
+size = Vector2(590, 300)
+
 [node name="Railway Survival" type="Node2D"]
 
 [node name="background" type="Node2D" parent="."]
@@ -151,6 +202,14 @@ offset_top = 28.0
 offset_right = 1136.0
 offset_bottom = 78.0
 
+[node name="name_train" type="Label" parent="background/Regulateur"]
+z_index = 1
+offset_left = 246.0
+offset_top = 18.0
+offset_right = 406.0
+offset_bottom = 41.0
+text = "INTÉGRITÉ DU TRAIN"
+
 [node name="SFX_Transition" type="AudioStreamPlayer2D" parent="background"]
 stream = ExtResource("5_of623")
 
@@ -160,14 +219,50 @@ parameters/looping = true
 
 [node name="SFX_Piece" type="AudioStreamPlayer2D" parent="background"]
 stream = ExtResource("7_tqddv")
+max_polyphony = 10
+
+[node name="SocleVie" type="Sprite2D" parent="background"]
+position = Vector2(540, 47)
+scale = Vector2(0.439909, 0.216504)
+texture = ExtResource("10_aryr7")
+
+[node name="vie_perdu_train" type="TextureProgressBar" parent="background/SocleVie"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -1473.0
+offset_top = -1426.0
+offset_right = -64.0
+offset_bottom = -719.0
+grow_horizontal = 2
+grow_vertical = 0
+value = 100.0
+nine_patch_stretch = true
+texture_progress = ExtResource("11_3sfp5")
+
+[node name="vie_train" type="TextureProgressBar" parent="background/SocleVie"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -1473.0
+offset_top = -1426.0
+offset_right = -64.0
+offset_bottom = -719.0
+grow_horizontal = 2
+grow_vertical = 0
+value = 100.0
+nine_patch_stretch = true
+texture_progress = ExtResource("12_bbwta")
 
 [node name="train" type="AnimatedSprite2D" parent="."]
-position = Vector2(316, 455)
+position = Vector2(611, 455)
 sprite_frames = SubResource("SpriteFrames_4cf3x")
 animation = &"run"
 autoplay = "run"
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
 
 [node name="piece" type="AnimatedSprite2D" parent="."]
 position = Vector2(1006, 40)
@@ -175,3 +270,18 @@ scale = Vector2(0.1595, 0.1575)
 sprite_frames = SubResource("SpriteFrames_tqddv")
 animation = &"run"
 autoplay = "run"
+
+[node name="AreaMoustique" type="Area2D" parent="."]
+position = Vector2(2414, 241)
+scale = Vector2(0.1, 0.1)
+script = ExtResource("13_nswt3")
+
+[node name="moustique" type="AnimatedSprite2D" parent="AreaMoustique"]
+scale = Vector2(1, 1)
+sprite_frames = SubResource("SpriteFrames_0chbm")
+autoplay = "default"
+
+[node name="CollisionMoustique" type="CollisionShape2D" parent="AreaMoustique"]
+position = Vector2(35, -130)
+scale = Vector2(0.999999, 0.999999)
+shape = SubResource("RectangleShape2D_62400")

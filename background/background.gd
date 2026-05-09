@@ -16,6 +16,14 @@ var ecart_parfait: float = 1144.0
 @onready var sfx_piece = $SFX_Piece 
 @onready var label_piece = $Regulateur/niveau_piece
 
+# --- RÉFÉRENCES VIE (Nouvelles) ---
+@onready var barre_verte = $SocleVie/vie_train
+@onready var barre_rouge = $SocleVie/vie_perdu_train
+
+# Variables de vie
+var pv_max : float = 100.0
+var pv_actuels : float = 100.0
+
 # Logique des pièces
 var score_pieces : int = 0
 var accumulation_distance : float = 0.0
@@ -25,9 +33,17 @@ var etat = "idle"
 
 func _ready():
 	vitesse_reelle = vitesse
-	# On active le Loop pour que la rotation soit fluide
+	
+	# Initialisation de la pièce
 	if piece:
 		piece.play("run")
+	
+	# INITIALISATION DES PV (Adapté)
+	if barre_verte and barre_rouge:
+		barre_verte.max_value = pv_max
+		barre_rouge.max_value = pv_max
+		barre_verte.value = pv_actuels
+		barre_rouge.value = pv_actuels
 
 func _process(delta):
 	# --- INTERPOLATION DE LA VITESSE ---
@@ -53,40 +69,53 @@ func _process(delta):
 	gerer_audio()
 	
 	if vitesse_reelle > 0.1:
-		# 1. Gestion du score (Distance parcourue)
 		accumulation_distance += vitesse_reelle * delta
 		if accumulation_distance >= distance_pour_une_piece:
 			gagner_piece()
 			accumulation_distance = 0.0
 			
-		# 2. Gestion des animations (Train et Pièce)
 		if not sprite_train.is_playing(): sprite_train.play()
 		if not piece.is_playing(): piece.play("run")
 		
-		# Les deux suivent la vitesse réelle du train
 		sprite_train.speed_scale = vitesse_reelle / 400.0
 		piece.speed_scale = vitesse_reelle / 400.0
 	else:
-		# Arrêt fluide quand le train ne bouge plus
 		if sprite_train.is_playing(): sprite_train.stop()
 		if piece.is_playing(): piece.stop()
 
+# --- FONCTION SCORE ---
 func gagner_piece():
 	score_pieces += 1
 	
-	# Mise à jour du texte
+	# 1. LE SON D'ABORD (Instantanté)
+	if sfx_piece:
+		sfx_piece.play()
+		
+	# 2. L'UI ENSUITE
 	if label_piece != null:
 		label_piece.text = str(score_pieces)
 		
-		# Effet de punch (grossissement du chiffre)
+		# On crée le tween pour l'effet visuel
 		var tween = create_tween()
-		tween.tween_property(label_piece, "scale", Vector2(1.5, 1.5), 0.1)
-		tween.tween_property(label_piece, "scale", Vector2(1.0, 1.0), 0.1)
-		
-	# Son du gain
-	if sfx_piece:
-		sfx_piece.play()
+		# On peut même réduire à 0.05 pour que ce soit plus nerveux
+		tween.tween_property(label_piece, "scale", Vector2(1.5, 1.5), 0.05)
+		tween.tween_property(label_piece, "scale", Vector2(1.0, 1.0), 0.05)
 
+# --- FONCTION VIE (La nouvelle logique) ---
+func subir_degats(montant):
+	pv_actuels -= montant
+	pv_actuels = clamp(pv_actuels, 0, pv_max)
+	
+	# Animation Verte (Rapide)
+	var tween_v = create_tween()
+	tween_v.tween_property(barre_verte, "value", pv_actuels, 0.2)
+	
+	# Animation Rouge (Délai fantôme)
+	var tween_r = create_tween()
+	tween_r.tween_interval(0.5) 
+	tween_r.tween_property(barre_rouge, "value", pv_actuels, 0.4).set_trans(Tween.TRANS_SINE)
+
+# --- FONCTION AUDIO ---
 func gerer_audio():
 	match etat:
 		"idle":
@@ -107,3 +136,7 @@ func gerer_audio():
 		"transition_arret":
 			if vitesse_reelle <= 0:
 				etat = "idle"
+				
+func _input(event):
+	if event.is_action_pressed("ui_accept"): 
+		subir_degats(15)
