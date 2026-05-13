@@ -17,22 +17,33 @@ func _ready():
 	# On synchronise le décor au lancement
 	decor.vitesse = paliers_vitesse[index_actuel]
 
+# --- DANS REGULATEUR.GD ---
+
 func _process(_delta):
 	var souris_pressee = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
 	
 	if souris_pressee and not clic_en_cours:
 		if _souris_sur_area(area_plus):
-			# On monte d'un palier
 			if index_actuel < paliers_vitesse.size() - 1:
-				index_actuel += 1
-				decor.vitesse = paliers_vitesse[index_actuel]
+				# --- CHANGEMENT ICI ---
+				var cible = paliers_vitesse[index_actuel + 1]
+				decor.ajuster_vitesse(cible)
+				
+				# On ne met à jour l'index et le label QUE si le décor a accepté la vitesse
+				if decor.vitesse == cible:
+					index_actuel += 1
+				# ----------------------
 			clic_en_cours = true
 			
 		elif _souris_sur_area(area_moins):
-			# On descend d'un palier
 			if index_actuel > 0:
-				index_actuel -= 1
-				decor.vitesse = paliers_vitesse[index_actuel]
+				# --- CHANGEMENT ICI ---
+				var cible = paliers_vitesse[index_actuel - 1]
+				decor.ajuster_vitesse(cible)
+				
+				if decor.vitesse == cible:
+					index_actuel -= 1
+				# ----------------------
 			clic_en_cours = true
 	
 	if not souris_pressee:

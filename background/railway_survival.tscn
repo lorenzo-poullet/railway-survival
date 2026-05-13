@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://i6hq04ibrr3p"]
+[gd_scene load_steps=38 format=3 uid="uid://i6hq04ibrr3p"]
 
 [ext_resource type="Texture2D" uid="uid://6fcom3h540ti" path="res://background/background.png" id="1_qi08d"]
 [ext_resource type="Script" uid="uid://7h2sq25tmfdr" path="res://background/background.gd" id="2_4cf3x"]
@@ -9,8 +9,11 @@
 [ext_resource type="AudioStream" uid="uid://bjclsiplnethj" path="res://train/train_mouvementV2.mp3" id="6_of623"]
 [ext_resource type="AudioStream" uid="uid://d1q4jfqnfd4cd" path="res://train/pièce.mp3" id="7_tqddv"]
 [ext_resource type="Texture2D" uid="uid://b6xwj6q7owyyj" path="res://train/pièceV2.png" id="8_tqddv"]
+[ext_resource type="AudioStream" uid="uid://tif5lcvf055e" path="res://train/xp1.mp3" id="9_h8dd5"]
 [ext_resource type="Texture2D" uid="uid://c2mugft4ffx4j" path="res://train/socle_vie.png" id="10_aryr7"]
+[ext_resource type="AudioStream" uid="uid://c7cagiw5xselu" path="res://train/xp2.mp3" id="10_bb02h"]
 [ext_resource type="Texture2D" uid="uid://d04r5dbw372gg" path="res://train/barre Rouge.png" id="11_3sfp5"]
+[ext_resource type="Texture2D" uid="uid://cx85o00wyvtq1" path="res://train/barre_bleue.png" id="11_62400"]
 [ext_resource type="Texture2D" uid="uid://clceg7wr4uf7g" path="res://enemy/moustique all.png" id="12_3sfp5"]
 [ext_resource type="Texture2D" uid="uid://dw8ellc2t0ylt" path="res://train/barre Verte.png" id="12_bbwta"]
 [ext_resource type="Script" uid="uid://clgk7ymavvj11" path="res://background/area_moustique.gd" id="13_nswt3"]
@@ -165,8 +168,13 @@ flip_h = true
 [node name="Regulateur" type="Node2D" parent="background"]
 script = ExtResource("3_ivben")
 
+[node name="Socle" type="Sprite2D" parent="background/Regulateur"]
+position = Vector2(578, 612)
+scale = Vector2(0.78776, 0.216504)
+texture = ExtResource("10_aryr7")
+
 [node name="Vitesse" type="Sprite2D" parent="background/Regulateur"]
-position = Vector2(1115, 610)
+position = Vector2(1082.5, 610)
 scale = Vector2(0.14388, 0.126953)
 texture = ExtResource("4_4cf3x")
 
@@ -178,7 +186,7 @@ scale = Vector2(1, 0.999999)
 shape = SubResource("RectangleShape2D_khhwp")
 
 [node name="Frein" type="Sprite2D" parent="background/Regulateur"]
-position = Vector2(993, 610)
+position = Vector2(960.5, 610)
 scale = Vector2(0.14388, 0.126953)
 texture = ExtResource("4_4cf3x")
 flip_h = true
@@ -191,10 +199,26 @@ scale = Vector2(1, 0.999999)
 shape = SubResource("RectangleShape2D_of623")
 
 [node name="niveau_regulateur" type="Label" parent="background/Regulateur"]
-offset_left = 1034.0
+offset_left = 1002.0
 offset_top = 595.0
-offset_right = 1099.0
+offset_right = 1067.0
 offset_bottom = 618.0
+
+[node name="OverlayLock" type="ColorRect" parent="background/Regulateur"]
+offset_left = 932.0
+offset_top = 583.0
+offset_right = 972.0
+offset_bottom = 623.0
+scale = Vector2(4.44, 1.24)
+color = Color(0, 0, 0, 0.666667)
+
+[node name="disponibilité" type="Label" parent="background/Regulateur/OverlayLock"]
+offset_left = 0.225225
+offset_top = 3.22581
+offset_right = 146.225
+offset_bottom = 26.2258
+scale = Vector2(0.271718, 1.3695)
+text = "Débloqué au Niv. 5"
 
 [node name="niveau_piece" type="Label" parent="background/Regulateur"]
 offset_left = 1048.0
@@ -219,6 +243,16 @@ parameters/looping = true
 
 [node name="SFX_Piece" type="AudioStreamPlayer2D" parent="background"]
 stream = ExtResource("7_tqddv")
+max_polyphony = 10
+
+[node name="SFX_XP" type="AudioStreamPlayer2D" parent="background"]
+stream = ExtResource("9_h8dd5")
+volume_db = 10.0
+max_polyphony = 10
+
+[node name="SFX_XP2" type="AudioStreamPlayer2D" parent="background"]
+stream = ExtResource("10_bb02h")
+volume_db = 5.0
 max_polyphony = 10
 
 [node name="SocleVie" type="Sprite2D" parent="background"]
@@ -258,6 +292,28 @@ value = 100.0
 nine_patch_stretch = true
 texture_progress = ExtResource("12_bbwta")
 
+[node name="xp" type="TextureProgressBar" parent="background/SocleVie"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -1922.78
+offset_top = 1169.96
+offset_right = -513.784
+offset_bottom = 1876.96
+grow_horizontal = 2
+grow_vertical = 0
+nine_patch_stretch = true
+texture_progress = ExtResource("11_62400")
+
+[node name="label_nv" type="Label" parent="background/SocleVie/xp"]
+offset_left = 29.5516
+offset_top = 290.988
+offset_right = 94.5516
+offset_bottom = 313.988
+scale = Vector2(1.81221, 4.40507)
+
 [node name="train" type="AnimatedSprite2D" parent="."]
 position = Vector2(611, 455)
 sprite_frames = SubResource("SpriteFrames_4cf3x")
@@ -277,7 +333,6 @@ scale = Vector2(0.1, 0.1)
 script = ExtResource("13_nswt3")
 
 [node name="moustique" type="AnimatedSprite2D" parent="AreaMoustique"]
-scale = Vector2(1, 1)
 sprite_frames = SubResource("SpriteFrames_0chbm")
 autoplay = "default"
 

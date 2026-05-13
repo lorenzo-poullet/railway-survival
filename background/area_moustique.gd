@@ -84,23 +84,27 @@ func _on_input_event(viewport, event, shape_idx):
 # On ajoute une variable en haut du script pour savoir s'il est mort
 var est_mort = false
 
+# --- DANS MOUSTIQUE.GD ---
+
 func mourir():
 	if est_mort: return
-	
 	est_mort = true
 	$moustique.stop()
 
-	# --- AJOUT DU SCORE (5 PIÈCES D'UN COUP) ---
 	if background:
-		background.score_pieces += 5 # Ajoute 5 au score
+		# 1. ON DONNE L'XP (Nouveau)
+		background.moustique_tue()
+		
+		# 2. ON DONNE LES PIÈCES (Ton code existant)
+		background.score_pieces += 5 
 		if background.label_piece:
-			background.label_piece.text = str(background.score_pieces) # Met à jour le texte
-			# Petit effet de scale sur le label (optionnel, repris de ton background.gd)
+			background.label_piece.text = str(background.score_pieces)
 			var tw = create_tween()
 			tw.tween_property(background.label_piece, "scale", Vector2(1.5, 1.5), 0.1)
 			tw.tween_property(background.label_piece, "scale", Vector2(1.0, 1.0), 0.1)
+		
 		if background.sfx_piece:
-			background.sfx_piece.play() # Joue le son une seule fois
+			background.sfx_piece.play()
 	# ------------------------------------------
 	
 	var tween = create_tween()
