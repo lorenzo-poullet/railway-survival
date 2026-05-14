@@ -18,6 +18,11 @@ var ecart_parfait: float = 1144.0
 @onready var sfx_xp = $SFX_XP
 @onready var sfx_xp2 = $SFX_XP2
 
+# --- NOUVELLES RÉFÉRENCES AUDIO DU TRAIN ---
+@onready var sfx_train_impact = $SFX_Train_impact
+@onready var sfx_train_impact_fatal = $SFX_Train_impact_fatal
+@onready var sfx_train_die = $SFX_Train_die
+
 # --- RÉFÉRENCES VIE ET XP ---
 @onready var barre_verte = $SocleVie/vie_train
 @onready var barre_rouge = $SocleVie/vie_perdu_train
@@ -41,6 +46,7 @@ var accumulation_distance : float = 0.0
 @export var distance_pour_une_piece : float = 1000.0 
 
 var etat = "idle"
+var est_mort : bool = false
 
 func _ready():
 	vitesse_reelle = vitesse
@@ -53,7 +59,7 @@ func _ready():
 		barre_verte.value = pv_actuels
 		barre_rouge.value = pv_actuels
 	
-	# Initialisation XP (Step à 0 pour la fluidité totale)
+	# Initialisation XP
 	if xp_barre:
 		xp_barre.step = 0.0 
 		xp_barre.max_value = xp_requise
@@ -80,7 +86,6 @@ func _process(delta):
 	gerer_audio()
 	
 	if vitesse_reelle > 0.1:
-		# Gain XP Passif (Effet tapis roulant fluide avec delta)
 		ajouter_xp((vitesse_reelle / 400.0) * gain_xp_vitesse * delta)
 		
 		accumulation_distance += vitesse_reelle * delta
@@ -109,7 +114,7 @@ func monter_niveau():
 	if sfx_xp: sfx_xp.play()
 	if sfx_xp2: sfx_xp2.play()
 	niveau_actuel += 1
-	xp_actuelle = max(0, xp_actuelle - xp_requise) # On garde le surplus
+	xp_actuelle = max(0, xp_actuelle - xp_requise)
 	xp_requise = xp_requise * 1.2
 	mettre_a_jour_ui_niveau()
 
@@ -118,7 +123,6 @@ func mettre_a_jour_ui_niveau():
 	if xp_barre:
 		xp_barre.max_value = xp_requise
 		xp_barre.value = xp_actuelle
-	# Affichage/Masquage de l'overlay noir
 	if overlay_lock:
 		overlay_lock.visible = (niveau_actuel < 5)
 
@@ -127,7 +131,6 @@ func moustique_tue():
 
 # --- COMMANDES (BLOCAGE NIVEAU 5) ---
 
-# Appelle ces fonctions depuis tes sprites Vitesse/Frein
 func ajuster_vitesse(nouvelle_vitesse):
 	if niveau_actuel >= 5:
 		vitesse = nouvelle_vitesse
@@ -145,12 +148,15 @@ func gagner_piece():
 		tw.tween_property(label_piece, "scale", Vector2(1.5, 1.5), 0.05)
 		tw.tween_property(label_piece, "scale", Vector2(1.0, 1.0), 0.05)
 
-# --- AJOUTER CETTE VARIABLE EN HAUT ---
-var est_mort : bool = false
-
-# --- MODIFICATION DE SUBIR_DEGATS ---
+# --- MODIFICATION DE SUBIR_DEGATS (AVEC SONS) ---
 func subir_degats(montant):
-	if est_mort: return # Empêche de mourir plusieurs fois pendant le freinage
+	if est_mort: return 
+	
+	# ANTERIOR CHECK : On vérifie si le coup va détruire le train avant d'appliquer les dégâts
+	if pv_actuels - montant <= 0:
+		if sfx_train_impact_fatal: sfx_train_impact_fatal.play()
+	else:
+		if sfx_train_impact: sfx_train_impact.play()
 	
 	pv_actuels -= montant
 	pv_actuels = clamp(pv_actuels, 0, pv_max)
@@ -165,23 +171,44 @@ func subir_degats(montant):
 	if pv_actuels <= 0:
 		sequence_mort_fluide()
 
-# --- LA NOUVELLE SÉQUENCE DE RESET ---
+# --- SÉQUENCE DE MORT ---
 func sequence_mort_fluide():
 	est_mort = true
 	print("Début du freinage d'urgence...")
 	
-	# 1. On force le freinage brutal via la vitesse cible
-	vitesse = 0.0
-	acceleration = 800.0 # On augmente l'accélération pour que le freinage soit sec
+	# 1. IMPACT & DESTRUCTION FINALE (IMMÉDIAT)
+	if sfx_train_die: 
+		sfx_train_die.play()
 	
-	# 2. On attend 2 secondes (pendant que le train finit de s'arrêter et que les sons jouent)
-	# On utilise un Timer via le code pour ne pas bloquer le jeu
+	# Force le freinage brutal du train dès le point d'impact
+	vitesse = 0.0
+	acceleration = 800.0 
+	
+	# Coupe le bruit de roulement normal pour laisser la place aux effets de mort
+	if sfx_mouvement: 
+		sfx_mouvement.stop()
+
+	# 2. ATTENTE DE 4 SECONDES (Pendant que le coup fatal et la mort résonnent)
+	await get_tree().create_timer(4.0).timeout
+
+	# 3. ÉTAPE 5e SECONDE : DÉCLENCHEMENT DE LA FUMÉE
+	if sfx_transition:
+		sfx_transition.pitch_scale = 1.0 # Vitesse du son normale
+		sfx_transition.volume_db = 6.0    # Boost de volume pour bien l'entendre (Fumée)
+		sfx_transition.play()
+		print("Le train s'arrête, la fumée s'échappe...")
+	
+	# 4. ATTENTE FINALE AVANT LE RESET (On laisse la fumée s'estomper)
 	await get_tree().create_timer(3.0).timeout
 	
-	# 3. On recharge carrément le niveau (Reset complet)
+	# 5. RECHARGE DU NIVEAU
+	print("Reset du prototype.")
 	get_tree().reload_current_scene()
 
 func gerer_audio():
+	# Si le train est mort, on ignore les transitions classiques d'idle/running
+	if est_mort: return
+
 	match etat:
 		"idle":
 			if vitesse > 0:
@@ -209,4 +236,3 @@ func _input(event):
 		# 2. ENTRÉE -> SEULEMENT LE NIVEAU
 		elif event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER:
 			monter_niveau()
-			
