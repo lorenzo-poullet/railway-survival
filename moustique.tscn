@@ -1,0 +1,136 @@
+[gd_scene load_steps=20 format=3 uid="uid://bma7br382n20n"]
+
+[ext_resource type="Script" uid="uid://clgk7ymavvj11" path="res://background/area_moustique.gd" id="1_n3dg0"]
+[ext_resource type="Texture2D" uid="uid://7g7c500a6bu4" path="res://enemy/attaque moustique.png" id="2_7povn"]
+[ext_resource type="Texture2D" uid="uid://c4bswcxhvpb0l" path="res://enemy/MoustiqueV2.png" id="3_2enca"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7e6lc"]
+atlas = ExtResource("2_7povn")
+region = Rect2(0, 0, 228, 182)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gagw1"]
+atlas = ExtResource("2_7povn")
+region = Rect2(228, 0, 228, 182)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ay70e"]
+atlas = ExtResource("2_7povn")
+region = Rect2(456, 0, 228, 182)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fdwc5"]
+atlas = ExtResource("2_7povn")
+region = Rect2(684, 0, 228, 182)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gdpoc"]
+atlas = ExtResource("2_7povn")
+region = Rect2(912, 0, 228, 182)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_41rmk"]
+atlas = ExtResource("2_7povn")
+region = Rect2(1140, 0, 228, 182)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bb02h"]
+atlas = ExtResource("3_2enca")
+region = Rect2(0, 0, 600, 598)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_smcq2"]
+atlas = ExtResource("3_2enca")
+region = Rect2(600, 0, 600, 598)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0chbm"]
+atlas = ExtResource("3_2enca")
+region = Rect2(1200, 0, 600, 598)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_poj3t"]
+atlas = ExtResource("3_2enca")
+region = Rect2(1800, 0, 600, 598)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cn4e3"]
+atlas = ExtResource("3_2enca")
+region = Rect2(2400, 0, 600, 598)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mucwo"]
+atlas = ExtResource("3_2enca")
+region = Rect2(3000, 0, 600, 598)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_v6i1v"]
+atlas = ExtResource("3_2enca")
+region = Rect2(3600, 0, 600, 598)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q3ers"]
+atlas = ExtResource("3_2enca")
+region = Rect2(4200, 0, 600, 598)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_u1rpf"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7e6lc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gagw1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ay70e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fdwc5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gdpoc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_41rmk")
+}],
+"loop": false,
+"name": &"attaque",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bb02h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_smcq2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0chbm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_poj3t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cn4e3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mucwo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_v6i1v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q3ers")
+}],
+"loop": true,
+"name": &"default",
+"speed": 120.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6d4dv"]
+size = Vector2(116, 55.0001)
+
+[node name="moustique" type="Node2D"]
+
+[node name="AreaMoustique" type="Area2D" parent="."]
+position = Vector2(2414, 241)
+script = ExtResource("1_n3dg0")
+
+[node name="moustique" type="AnimatedSprite2D" parent="AreaMoustique"]
+scale = Vector2(0.3, 0.3)
+sprite_frames = SubResource("SpriteFrames_u1rpf")
+animation = &"attaque"
+autoplay = "default"
+
+[node name="CollisionMoustique" type="CollisionShape2D" parent="AreaMoustique"]
+position = Vector2(13, -9.5)
+scale = Vector2(0.999998, 0.999998)
+shape = SubResource("RectangleShape2D_6d4dv")

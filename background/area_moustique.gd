@@ -3,21 +3,19 @@ extends Area2D
 @onready var background = get_node_or_null("../background")
 @onready var area_train = get_node_or_null("../train/AreaTrain")
 
-# Références dynamiques pour les sons situés dans le background
 @onready var sfx_vol = background.get_node_or_null("SFX_MOUSTIQUE") if background else null
 @onready var sfx_attaque = background.get_node_or_null("SFX_MOUSTIQUE_ATTAQUE") if background and background.has_node("SFX_MOUSTIQUE_ATTAQUE") else (background.get_node_or_null("SFX_MOUSTIQUE_ATTA") if background else null)
 @onready var sfx_mort = background.get_node_or_null("SFX_MOUSTIQUE_DIE") if background else null
 
-# Paramètres de position et zones
+# Paramètres de base (Valeurs par défaut)
 var train_x = 611.0
 var zone_h_min = 227.0
 var zone_h_max = 335.0
 var largeur_securite = 180.0 
 
-# Paramètres de vol et d'attaque
-var vitesse_approche = 280.0
-var vitesse_pique = 750.0 
-var vitesse_zigzag = 3.5
+var vitesse_approche_base = 280.0
+var vitesse_pique_base = 750.0 
+var vitesse_zigzag_base = 3.5
 var amplitude_x = 60.0 
 
 # Variables de contrôle
@@ -32,7 +30,6 @@ var temps_depuis_attaque = 0.0
 var point_attaque_cible = Vector2.ZERO
 var a_rate_cible = false 
 
-# Variables de combat et audio
 var est_mort = false
 var a_inflige_degat = false  
 var distance_max_soudure = 1500.0 
@@ -40,10 +37,8 @@ var distance_max_soudure = 1500.0
 func _ready():
 	temps = randf() * 10.0
 	input_event.connect(_on_input_event)
-	
 	area_entered.connect(_on_area_entered)
 	$moustique.animation_finished.connect(_on_animation_finished)
-	
 	reinitialiser_position()
 
 func reinitialiser_position():
@@ -69,13 +64,22 @@ func reinitialiser_position():
 func _process(delta):
 	if est_mort: return
 
-	temps += delta
+	# --- MISE À ÉCHELLE DE LA VITESSE DU MOUSTIQUE ---
+	# Plus le train va vite, plus le moustique est nerveux !
+	var modificateur_vitesse = 1.0
+	if background:
+		modificateur_vitesse = max(0.6, background.vitesse_reelle / 400.0)
+
+	var v_approche = vitesse_approche_base * modificateur_vitesse
+	var v_pique = vitesse_pique_base * modificateur_vitesse
+	var v_zigzag = vitesse_zigzag_base * modificateur_vitesse
+
+	temps += delta * modificateur_vitesse
 	temps_cote += delta
 
 	if area_train:
 		train_x = area_train.global_position.x
 
-	# --- GESTION DU SON D'AMBIANCE ---
 	if sfx_vol and sfx_vol.playing:
 		var distance_au_train = abs(position.x - train_x)
 		var intensite = 1.0 - clamp(distance_au_train / distance_max_soudure, 0.0, 1.0)
@@ -85,20 +89,17 @@ func _process(delta):
 	if $moustique.animation == "attaque":
 		$moustique.flip_h = position.x >= train_x 
 		
-		# GEL FRAME 2
 		if not a_inflige_degat and not a_rate_cible:
 			if $moustique.frame >= 2:
 				$moustique.pause()
 				$moustique.frame = 2
 		
-		# MOUVEMENT : S'arrête dès que la collision passe à true
 		if not a_inflige_degat and not a_rate_cible:
-			global_position = global_position.move_toward(point_attaque_cible, vitesse_pique * delta)
+			global_position = global_position.move_toward(point_attaque_cible, v_pique * delta)
 			
 			if global_position.distance_to(point_attaque_cible) < 15.0:
 				a_rate_cible = true
 				$moustique.play() 
-			
 		return 
 
 	# --- COMPORTEMENT DE VOL NORMAL ---
@@ -107,7 +108,7 @@ func _process(delta):
 	if phase_approche:
 		var destination_x = train_x + (largeur_securite * cote_actuel)
 		var direction = 1 if position.x < destination_x else -1
-		position.x += direction * vitesse_approche * delta
+		position.x += direction * v_approche * delta
 		
 		var milieu_y = (zone_h_min + zone_h_max) / 2
 		position.y = lerp(position.y, milieu_y + sin(temps * 2) * 20, delta * 2)
@@ -117,15 +118,14 @@ func _process(delta):
 			temps_depuis_attaque = 5.0 
 	else:
 		var pivot_x = train_x + (largeur_securite * cote_actuel)
-		var zigzag_x = pivot_x + sin(temps * vitesse_zigzag) * amplitude_x
+		var zigzag_x = pivot_x + sin(temps * v_zigzag) * amplitude_x
 		var milieu_y = (zone_h_min + zone_h_max) / 2
 		var range_y = (zone_h_max - zone_h_min) / 2
-		var zigzag_y = milieu_y + cos(temps * vitesse_zigzag * 0.7) * range_y
+		var zigzag_y = milieu_y + cos(temps * v_zigzag * 0.7) * range_y
 		
 		position.x = lerp(position.x, zigzag_x, delta * 3.0)
 		position.y = lerp(position.y, zigzag_y, delta * 3.0)
 
-		# CHRONOMÈTRE DE 7 SECONDES
 		temps_depuis_attaque += delta
 		if temps_depuis_attaque >= 7.0:
 			lancer_attaque()
@@ -135,14 +135,11 @@ func _process(delta):
 			temps_cote = 0.0
 			phase_approche = true 
 
-# --- GARDÉ INTÉGRALEMENT TES SCALES DE SÉCURITÉ ---
 func configurer_visuel_vol():
 	$moustique.scale = Vector2(0.2, 0.2)
 
 func configurer_visuel_attaque():
 	$moustique.scale = Vector2(0.6, 0.6)
-
-# --- FONCTIONS DE COMBAT (CORRECTION DE LA TRAJECTOIRE DE VISÉE) ---
 
 func lancer_attaque():
 	if est_mort or $moustique.animation == "attaque": return
@@ -155,21 +152,18 @@ func lancer_attaque():
 		var centre_train_x = area_train.global_position.x
 		var décalage_bord_x = 0.0
 		
-		# On cherche dynamiquement la taille du rectangle de collision pour trouver le bord exact
 		var shape_owner = area_train.get_child(0)
 		if shape_owner and shape_owner is CollisionShape2D and shape_owner.shape is RectangleShape2D:
 			décalage_bord_x = (shape_owner.shape.size.x / 2.0) * shape_owner.global_scale.x
 		else:
-			décalage_bord_x = 75.0 # Valeur par défaut si non trouvé
+			décalage_bord_x = 75.0 
 			
-		# Calcule la cible sur le flanc gauche ou droit selon la position du moustique
 		var cible_x = 0.0
 		if global_position.x > centre_train_x:
 			cible_x = centre_train_x + décalage_bord_x
 		else:
 			cible_x = centre_train_x - décalage_bord_x
 			
-		# VARIATION DE L'ENDROIT D'ATTAQUE : Aléatoire sur toute la hauteur (Y) du train
 		var dispersion_y = randf_range(-65.0, 65.0) 
 		point_attaque_cible = Vector2(cible_x, area_train.global_position.y + dispersion_y)
 	else:
@@ -177,36 +171,30 @@ func lancer_attaque():
 	
 	configurer_visuel_attaque()
 	$moustique.play("attaque")
-	
-	if sfx_attaque:
-		sfx_attaque.play()
+	if sfx_attaque: sfx_attaque.play()
 
 func _on_animation_finished():
 	if $moustique.animation == "attaque" and not est_mort:
 		configurer_visuel_vol()
 		$moustique.play("default")
 
-# --- DÉTECTION DE COLLISION STABILISÉE ---
 func _on_area_entered(area):
 	if est_mort: return
-	
 	if area.name == "AreaTrain" and $moustique.animation == "attaque" and not a_inflige_degat:
 		a_inflige_degat = true
-		
-		# Sécurité anti-pénétration : On le fige immédiatement sur le X de sa cible (le bord extérieur)
 		global_position.x = point_attaque_cible.x
-		
-		$moustique.play() # Reprise de l'animation pour l'impact
+		$moustique.play() 
 		infliger_degat_train()
 
 func infliger_degat_train():
 	if background and background.has_method("subir_degats"):
 		background.subir_degats(10) 
-		print("BAM ! Le moustique a frappé la bordure. -10 PV.")
 
-# --- MORT ---
+# --- GESTION DU CLIC / TIR DU CANON (SÉCURISÉ ANTI MULTI-KILL) ---
 func _on_input_event(viewport, event, shape_idx):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		# Consomme l'input pour empêcher les autres moustiques en dessous de le capter !
+		get_viewport().set_input_as_handled()
 		mourir()
 
 func mourir():
@@ -215,21 +203,19 @@ func mourir():
 	$moustique.stop()
 	configurer_visuel_vol()
 
-	if sfx_vol:
-		sfx_vol.stop()
-	if sfx_mort:
-		sfx_mort.play()
+	if sfx_vol: sfx_vol.stop()
+	if sfx_mort: sfx_mort.play()
 
 	if background:
+		# On donne l'XP au joueur via ta fonction
 		background.moustique_tue()
-		background.score_pieces += 5 
-		if background.label_piece:
-			background.label_piece.text = str(background.score_pieces)
-			var tw = create_tween()
-			tw.tween_property(background.label_piece, "scale", Vector2(1.5, 1.5), 0.1)
-			tw.tween_property(background.label_piece, "scale", Vector2(1.0, 1.0), 0.1)
-		if background.sfx_piece:
-			background.sfx_piece.play()
+		
+		# Au lieu de modifier la variable à la main, on appelle ta fonction 
+		# qui gère le bruitage et l'animation de scale du texte !
+		if background.has_method("gagner_piece"):
+			# On l'appelle plusieurs fois si tu veux donner plus de pièces par moustique (ex: 5 fois)
+			for i in range(5):
+				background.gagner_piece()
 	
 	var tween = create_tween()
 	var sens_choc = -1 if position.x < train_x else 1

@@ -1,0 +1,92 @@
+[gd_scene load_steps=13 format=3 uid="uid://b5rnm0cmiru3f"]
+
+[ext_resource type="Texture2D" uid="uid://cy16s3yenwy6b" path="res://background/g1.png" id="1_m7y6r"]
+[ext_resource type="Script" uid="uid://dy1rybq8ae1ex" path="res://grotte.gd" id="1_qxsbp"]
+[ext_resource type="Texture2D" uid="uid://bnxvf7nt4occt" path="res://background/g2.png" id="2_na0ox"]
+[ext_resource type="Texture2D" uid="uid://cwhlgdtnafkcv" path="res://train/train_moveV2.png" id="4_tgpef"]
+[ext_resource type="AudioStream" uid="uid://bxh1cyqfwybru" path="res://train/fumee_train.mp3" id="5_xgk5e"]
+[ext_resource type="AudioStream" uid="uid://bjclsiplnethj" path="res://train/train_mouvementV2.mp3" id="6_803vy"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qi08d"]
+atlas = ExtResource("4_tgpef")
+region = Rect2(0, 0, 612, 408)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a54db"]
+atlas = ExtResource("4_tgpef")
+region = Rect2(612, 0, 612, 408)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4cf3x"]
+atlas = ExtResource("4_tgpef")
+region = Rect2(1224, 0, 612, 408)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ivben"]
+atlas = ExtResource("4_tgpef")
+region = Rect2(1836, 0, 612, 408)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_xgk5e"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qi08d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a54db")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4cf3x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ivben")
+}],
+"loop": true,
+"name": &"run",
+"speed": 12.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_803vy"]
+size = Vector2(237, 93.5)
+
+[node name="grotte" type="Node2D"]
+script = ExtResource("1_qxsbp")
+
+[node name="g1" type="Sprite2D" parent="."]
+position = Vector2(578, 323.5)
+scale = Vector2(0.707, 0.707)
+texture = ExtResource("1_m7y6r")
+
+[node name="g2" type="Sprite2D" parent="."]
+position = Vector2(1722, 323.5)
+scale = Vector2(0.707, 0.707)
+texture = ExtResource("2_na0ox")
+
+[node name="g2_bis" type="Sprite2D" parent="."]
+position = Vector2(2866, 323.5)
+scale = Vector2(0.707, 0.707)
+texture = ExtResource("2_na0ox")
+flip_h = true
+
+[node name="SFX_Transition" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("5_xgk5e")
+volume_db = 5.0
+
+[node name="train" type="AnimatedSprite2D" parent="."]
+position = Vector2(260, 435)
+sprite_frames = SubResource("SpriteFrames_xgk5e")
+animation = &"run"
+autoplay = "run"
+
+[node name="AreaTrain" type="Area2D" parent="train"]
+
+[node name="CollisionTrain" type="CollisionShape2D" parent="train/AreaTrain"]
+position = Vector2(-13, -33)
+shape = SubResource("RectangleShape2D_803vy")
+
+[node name="SFX_Mouvement" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_803vy")
+parameters/looping = true
+
+[node name="LabelDebugDev" type="Label" parent="."]
+offset_left = 73.0
+offset_top = 54.0
+offset_right = 391.0
+offset_bottom = 77.0

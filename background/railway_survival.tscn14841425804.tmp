@@ -432,10 +432,10 @@ offset_bottom = 313.988
 scale = Vector2(1.81221, 4.40507)
 
 [node name="LabelDebugDev" type="Label" parent="background"]
-offset_left = 10.0
-offset_top = 81.0
-offset_right = 328.0
-offset_bottom = 104.0
+offset_left = 357.0
+offset_top = 87.0
+offset_right = 675.0
+offset_bottom = 110.0
 
 [node name="train" type="AnimatedSprite2D" parent="."]
 position = Vector2(611, 455)
