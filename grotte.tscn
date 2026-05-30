@@ -1,50 +1,78 @@
-[gd_scene load_steps=13 format=3 uid="uid://b5rnm0cmiru3f"]
+[gd_scene load_steps=17 format=3 uid="uid://b5rnm0cmiru3f"]
 
 [ext_resource type="Texture2D" uid="uid://cy16s3yenwy6b" path="res://background/g1.png" id="1_m7y6r"]
 [ext_resource type="Script" uid="uid://dy1rybq8ae1ex" path="res://grotte.gd" id="1_qxsbp"]
 [ext_resource type="Texture2D" uid="uid://bnxvf7nt4occt" path="res://background/g2.png" id="2_na0ox"]
-[ext_resource type="Texture2D" uid="uid://cwhlgdtnafkcv" path="res://train/train_moveV2.png" id="4_tgpef"]
 [ext_resource type="AudioStream" uid="uid://bxh1cyqfwybru" path="res://train/fumee_train.mp3" id="5_xgk5e"]
 [ext_resource type="AudioStream" uid="uid://bjclsiplnethj" path="res://train/train_mouvementV2.mp3" id="6_803vy"]
+[ext_resource type="Texture2D" uid="uid://dfalb3usw410o" path="res://train/TrainV2.png" id="6_xgk5e"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_qi08d"]
-atlas = ExtResource("4_tgpef")
-region = Rect2(0, 0, 612, 408)
+[sub_resource type="AtlasTexture" id="AtlasTexture_xgk5e"]
+atlas = ExtResource("6_xgk5e")
+region = Rect2(0, 0, 150, 113)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_a54db"]
-atlas = ExtResource("4_tgpef")
-region = Rect2(612, 0, 612, 408)
+[sub_resource type="AtlasTexture" id="AtlasTexture_803vy"]
+atlas = ExtResource("6_xgk5e")
+region = Rect2(150, 0, 150, 113)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_4cf3x"]
-atlas = ExtResource("4_tgpef")
-region = Rect2(1224, 0, 612, 408)
+[sub_resource type="AtlasTexture" id="AtlasTexture_7fb11"]
+atlas = ExtResource("6_xgk5e")
+region = Rect2(0, 113, 150, 113)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ivben"]
-atlas = ExtResource("4_tgpef")
-region = Rect2(1836, 0, 612, 408)
+[sub_resource type="AtlasTexture" id="AtlasTexture_weytw"]
+atlas = ExtResource("6_xgk5e")
+region = Rect2(150, 113, 150, 113)
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_xgk5e"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_axdgo"]
+atlas = ExtResource("6_xgk5e")
+region = Rect2(0, 226, 150, 113)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ru7el"]
+atlas = ExtResource("6_xgk5e")
+region = Rect2(150, 226, 150, 113)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wykt3"]
+atlas = ExtResource("6_xgk5e")
+region = Rect2(0, 339, 150, 113)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c1747"]
+atlas = ExtResource("6_xgk5e")
+region = Rect2(150, 339, 150, 113)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_803vy"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_qi08d")
+"texture": SubResource("AtlasTexture_xgk5e")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_a54db")
+"texture": SubResource("AtlasTexture_803vy")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_4cf3x")
+"texture": SubResource("AtlasTexture_7fb11")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_ivben")
+"texture": SubResource("AtlasTexture_weytw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_axdgo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ru7el")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wykt3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_c1747")
 }],
 "loop": true,
 "name": &"run",
 "speed": 12.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_803vy"]
-size = Vector2(237, 93.5)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7fb11"]
+size = Vector2(98.5, 39)
 
 [node name="grotte" type="Node2D"]
 script = ExtResource("1_qxsbp")
@@ -69,21 +97,22 @@ flip_h = true
 stream = ExtResource("5_xgk5e")
 volume_db = 5.0
 
+[node name="SFX_Mouvement" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_803vy")
+parameters/looping = true
+
 [node name="train" type="AnimatedSprite2D" parent="."]
-position = Vector2(260, 435)
-sprite_frames = SubResource("SpriteFrames_xgk5e")
+position = Vector2(572, 427)
+scale = Vector2(2, 2)
+sprite_frames = SubResource("SpriteFrames_803vy")
 animation = &"run"
 autoplay = "run"
 
 [node name="AreaTrain" type="Area2D" parent="train"]
 
 [node name="CollisionTrain" type="CollisionShape2D" parent="train/AreaTrain"]
-position = Vector2(-13, -33)
-shape = SubResource("RectangleShape2D_803vy")
-
-[node name="SFX_Mouvement" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("6_803vy")
-parameters/looping = true
+position = Vector2(-5.25, -3.5)
+shape = SubResource("RectangleShape2D_7fb11")
 
 [node name="LabelDebugDev" type="Label" parent="."]
 offset_left = 73.0

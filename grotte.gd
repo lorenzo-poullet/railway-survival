@@ -42,6 +42,14 @@ var g1_scale_depart: Vector2
 var g2_scale_depart: Vector2
 var g2_bis_scale_depart: Vector2
 
+var debug_label_visible : bool = true
+
+func basculer_label_debug():
+	debug_label_visible = not debug_label_visible
+	
+	if label_debug:
+		label_debug.visible = debug_label_visible
+		
 func _ready():
 	if label_debug:
 		label_debug.add_theme_font_size_override("font_size", 10)
@@ -225,19 +233,35 @@ func lancer_retour_surface():
 	)
 
 func actualiser_label_debug():
-	if label_debug:
-		label_debug.text = "debug fonctionnement visuel temporaire\n"
-		label_debug.text += "-----------------------------------------\n"
-		label_debug.text += "ZONE : GROTTE / CHARGEMENT\n"
-		label_debug.text += "Temps : " + str(snapped(chrono_grotte, 0.1)) + " s\n"
-		label_debug.text += "Fondu entrée : " + str(fondu_entree_en_cours) + "\n"
-		label_debug.text += "Sortie active : " + str(transition_sortie_active) + "\n"
-		label_debug.text += "Sortie injectée : " + str(sortie_injectee) + "\n"
-		label_debug.text += "Audio : " + etat_audio + "\n"
-		label_debug.text += "Vitesse : " + str(snapped(vitesse_reelle, 1.0)) + "\n"
-		label_debug.text += "g1 x : " + str(snapped(g1.position.x, 1.0)) + "\n"
-		label_debug.text += "g1 scale : " + str(g1.scale) + "\n"
-		label_debug.text += "g2 x : " + str(snapped(g2.position.x, 1.0)) + "\n"
-		label_debug.text += "g2 scale : " + str(g2.scale) + "\n"
-		label_debug.text += "g2_bis x : " + str(snapped(g2_bis.position.x, 1.0)) + "\n"
-		label_debug.text += "g2_bis scale : " + str(g2_bis.scale) + "\n"
+	if not label_debug:
+		return
+	
+	label_debug.visible = debug_label_visible
+	
+	if not debug_label_visible:
+		return
+	
+	label_debug.text = "debug fonctionnement visuel temporaire\n"
+	label_debug.text += "-----------------------------------------\n"
+	label_debug.text += "ZONE : GROTTE / CHARGEMENT\n"
+	label_debug.text += "Temps : " + str(snapped(chrono_grotte, 0.1)) + " s\n"
+	label_debug.text += "Fondu entrée : " + str(fondu_entree_en_cours) + "\n"
+	label_debug.text += "Sortie active : " + str(transition_sortie_active) + "\n"
+	label_debug.text += "Sortie injectée : " + str(sortie_injectee) + "\n"
+	label_debug.text += "Audio : " + etat_audio + "\n"
+	label_debug.text += "Vitesse : " + str(snapped(vitesse_reelle, 1.0)) + "\n"
+	label_debug.text += "g1 x : " + str(snapped(g1.position.x, 1.0)) + "\n"
+	label_debug.text += "g2 x : " + str(snapped(g2.position.x, 1.0)) + "\n"
+	label_debug.text += "g2_bis x : " + str(snapped(g2_bis.position.x, 1.0)) + "\n"
+	
+	label_debug.text += "\n"
+	label_debug.text += "COMMANDES DEBUG\n"
+	label_debug.text += "F1 : afficher / cacher ce label\n"
+	label_debug.text += "Entrée : niveau +1 uniquement en surface\n"
+	label_debug.text += "Espace : dégâts train uniquement en surface\n"
+	label_debug.text += "F2 : reset cooldown régulateur uniquement en surface\n"
+		
+func _input(event):
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_F1:
+			basculer_label_debug()

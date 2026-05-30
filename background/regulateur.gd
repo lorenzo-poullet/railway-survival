@@ -1,3 +1,4 @@
+# regulateur.gd
 extends Node2D
 
 @onready var decor = get_parent()
@@ -13,22 +14,30 @@ var index_actuel = 2
 var clic_en_cours = false
 
 # --- SÉCURITÉ ANTI-SPAM LOGIQUE ---
-var temps_cooldown : float = 21.0 # 21 secondes de blocage total
+var temps_cooldown : float = 21.0
 var minuterie_cooldown : float = 0.0
+
+# --- DEBUG TEST ---
+var texte_reset_debug_timer : float = 0.0
+
 
 func _ready():
 	decor.vitesse = paliers_vitesse[index_actuel]
 
+
 func _process(delta):
-	# Diminution du verrou temporel
 	if minuterie_cooldown > 0.0:
 		minuterie_cooldown -= delta
 		if minuterie_cooldown < 0.0:
 			minuterie_cooldown = 0.0
+	
+	if texte_reset_debug_timer > 0.0:
+		texte_reset_debug_timer -= delta
+		if texte_reset_debug_timer < 0.0:
+			texte_reset_debug_timer = 0.0
 
 	var souris_pressee = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
 	
-	# Détection des clics uniquement si le régulateur n'est pas bloqué
 	if souris_pressee and not clic_en_cours and minuterie_cooldown <= 0.0:
 		
 		if _souris_sur_area(area_plus):
@@ -38,7 +47,8 @@ func _process(delta):
 				
 				if decor.vitesse == cible:
 					index_actuel += 1
-					minuterie_cooldown = temps_cooldown # Déclenchement
+					minuterie_cooldown = temps_cooldown
+			
 			clic_en_cours = true
 			
 		elif _souris_sur_area(area_moins):
@@ -48,17 +58,31 @@ func _process(delta):
 				
 				if decor.vitesse == cible:
 					index_actuel -= 1
-					minuterie_cooldown = temps_cooldown # Déclenchement
+					minuterie_cooldown = temps_cooldown
+			
 			clic_en_cours = true
 	
 	if not souris_pressee:
 		clic_en_cours = false
 
-	# --- AFFICHAGE CONTEXTUEL DU TEXTE ---
-	if minuterie_cooldown > 0.0:
-		label.text = str(ceil(minuterie_cooldown)) + "s" # Affiche la valeur arrondie (ex: 21s, 20s...)
+	if texte_reset_debug_timer > 0.0:
+		label.text = "RESET"
+	elif minuterie_cooldown > 0.0:
+		label.text = str(ceil(minuterie_cooldown)) + "s"
 	else:
-		label.text = paliers_noms[index_actuel] # Retour à la normale (ex: x1.00)
+		label.text = paliers_noms[index_actuel]
+
+
+func _input(event):
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_F2:
+			reset_cooldown_debug()
+
+
+func reset_cooldown_debug():
+	minuterie_cooldown = 0.0
+	texte_reset_debug_timer = 0.5
+
 
 func _souris_sur_area(area):
 	var mouse_pos = area.get_local_mouse_position()

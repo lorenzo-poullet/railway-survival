@@ -1,4 +1,4 @@
-[gd_scene load_steps=99 format=3 uid="uid://i6hq04ibrr3p"]
+[gd_scene load_steps=94 format=3 uid="uid://i6hq04ibrr3p"]
 
 [ext_resource type="Texture2D" uid="uid://6fcom3h540ti" path="res://background/background.png" id="1_qi08d"]
 [ext_resource type="Script" uid="uid://7h2sq25tmfdr" path="res://background/background.gd" id="2_4cf3x"]
@@ -19,16 +19,11 @@
 [ext_resource type="AudioStream" uid="uid://d2d3sjs5vg1ji" path="res://enemy/insecte-die.mp3" id="11_smcq2"]
 [ext_resource type="Texture2D" uid="uid://dw8ellc2t0ylt" path="res://train/barre Verte.png" id="12_bbwta"]
 [ext_resource type="Script" uid="uid://clgk7ymavvj11" path="res://background/area_moustique.gd" id="13_nswt3"]
-[ext_resource type="AudioStream" uid="uid://c0ujs2734e5po" path="res://enemy/mouche.mp3" id="14_mv7gf"]
 [ext_resource type="AudioStream" uid="uid://b8p6oe6umufl6" path="res://train/0-vie.mp3" id="14_v6i1v"]
-[ext_resource type="AudioStream" uid="uid://p0xwfp47u2oo" path="res://enemy/attack_mouche.mp3" id="15_ik583"]
 [ext_resource type="AudioStream" uid="uid://bk8agvioar75a" path="res://train/impact_train.mp3" id="15_q3ers"]
-[ext_resource type="AudioStream" uid="uid://pivagv8hbpng" path="res://enemy/araignée.mp3" id="16_2h6np"]
 [ext_resource type="AudioStream" uid="uid://dedppj2f1vlrh" path="res://train/coup-fatal.mp3" id="16_7e6lc"]
 [ext_resource type="Texture2D" uid="uid://7g7c500a6bu4" path="res://enemy/attaque moustique.png" id="17_bb02h"]
 [ext_resource type="Texture2D" uid="uid://c4bswcxhvpb0l" path="res://enemy/MoustiqueV2.png" id="17_h8dd5"]
-[ext_resource type="AudioStream" uid="uid://dohm6hi8m3nr7" path="res://enemy/frelon.mp3" id="17_rjmud"]
-[ext_resource type="AudioStream" uid="uid://dp61vhr6502ht" path="res://enemy/frelon_2.mp3" id="18_x8sni"]
 [ext_resource type="Texture2D" uid="uid://dfalb3usw410o" path="res://train/TrainV2.png" id="21_q3ers"]
 [ext_resource type="Texture2D" uid="uid://ubydurcq16i2" path="res://enemy/moucheV2.png" id="26_7e6lc"]
 [ext_resource type="Script" uid="uid://dq2diew8dsst3" path="res://background/area_mouche.gd" id="26_gagw1"]
@@ -576,31 +571,6 @@ parameters/looping = true
 stream = ExtResource("11_0chbm")
 volume_db = 5.0
 max_polyphony = 10
-
-[node name="SFX_MOUCHE" type="AudioStreamPlayer2D" parent="background"]
-stream = ExtResource("14_mv7gf")
-max_polyphony = 10
-parameters/looping = true
-
-[node name="SFX_MOUCHE_ATTACK" type="AudioStreamPlayer2D" parent="background"]
-stream = ExtResource("15_ik583")
-volume_db = 5.0
-max_polyphony = 10
-
-[node name="SFX_SPIDER" type="AudioStreamPlayer2D" parent="background"]
-stream = ExtResource("16_2h6np")
-max_polyphony = 10
-parameters/looping = true
-
-[node name="SFX_FRELON" type="AudioStreamPlayer2D" parent="background"]
-stream = ExtResource("17_rjmud")
-max_polyphony = 10
-parameters/looping = true
-
-[node name="SFX_FRELON_V2" type="AudioStreamPlayer2D" parent="background"]
-stream = ExtResource("18_x8sni")
-max_polyphony = 10
-parameters/looping = true
 
 [node name="SFX_DIE" type="AudioStreamPlayer2D" parent="background"]
 stream = ExtResource("11_smcq2")
